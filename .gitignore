@@ -17,3 +17,6 @@ logs/
 
 # Docker
 docker-data/
+
+# pg_dump
+sql/netflix.sql
