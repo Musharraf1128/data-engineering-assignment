@@ -3,6 +3,7 @@ from api.schemas import ShowIngestPayload
 from api.validators import parse_duration, validate_type
 from api.db import get_conn
 from api import repository as repo
+from datetime import datetime
 
 router = APIRouter()
 
@@ -17,6 +18,11 @@ def ingest_show(payload: ShowIngestPayload):
     try:
         with get_conn() as conn:
             rating_id = repo.get_rating_id(conn, payload.rating)
+
+            # normalize date_added
+            date_added = payload.date_added
+            if isinstance(date_added, datetime):
+                date_added = date_added.date()
 
             with conn.cursor() as cur:
                 cur.execute(
@@ -35,7 +41,7 @@ def ingest_show(payload: ShowIngestPayload):
                         payload.title,
                         payload.description,
                         payload.release_year,
-                        payload.date_added,
+                        date_added,
                         duration_value,
                         duration_unit,
                         rating_id,

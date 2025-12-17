@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict
-from datetime import date
+from datetime import date, datetime
 
 class PeoplePayload(BaseModel):
     actors: List[str] = Field(default_factory=list)
@@ -12,7 +12,7 @@ class ShowIngestPayload(BaseModel):
     type: str
     description: str | None = None
     release_year: int | None = None
-    date_added: date | None = None
+    date_added: date | datetime | None = None
     duration: str
     rating: str | None = None
     genres: List[str]
