@@ -20,3 +20,4 @@ docker-data/
 
 # pg_dump
 sql/netflix.sql
+netflix_db.sql

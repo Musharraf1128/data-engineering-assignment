@@ -2,13 +2,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from extract import fetch_staging_rows
-from transform import (
-    transform_ratings,
-    transform_genres,
-    transform_shows,
-    transform_countries,
-    transform_people,
-)
+from transform import transform_ratings, transform_genres, transform_shows, transform_countries, transform_people
 from load import (
     insert_ratings,
     insert_genres,
@@ -20,7 +14,7 @@ from load import (
     insert_show_countries,
     insert_people,
     fetch_person_map,
-    insert_show_people,
+    insert_show_people
 )
 
 def main():
@@ -32,7 +26,7 @@ def main():
         password="admin123"
     )
 
-    # ---------- RATINGS ----------
+    # RATINGS ETL
     rows = fetch_staging_rows(conn)
     ratings, rejected_ratings = transform_ratings(rows)
     insert_ratings(conn, ratings)
@@ -40,16 +34,17 @@ def main():
     print(f"Inserted ratings: {sorted(ratings)}")
     print(f"Rejected rating values: {sorted(rejected_ratings)}")
 
-    # ---------- GENRES ----------
+    # GENRES ETL
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute("SELECT show_id, listed_in FROM staging_netflix_shows")
-        genre_rows = cur.fetchall()
+        rows = cur.fetchall()
 
-    genres, show_genres, rejected_genres = transform_genres(genre_rows)
+    genres, show_genres, rejected_genres = transform_genres(rows)
+
     insert_genres(conn, genres)
     genre_map = fetch_genre_map(conn)
 
-    # ---------- SHOWS ----------
+    # ---- SHOWS ETL ----
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute("""
             SELECT
@@ -75,12 +70,13 @@ def main():
     shows = transform_shows(show_rows, rating_map)
     insert_shows(conn, shows)
 
-    # ---------- COUNTRIES ----------
+    # COUNTRIES ETL
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute("SELECT show_id, country FROM staging_netflix_shows")
-        country_rows = cur.fetchall()
+        rows = cur.fetchall()
 
-    countries, show_countries, rejected_countries = transform_countries(country_rows)
+    countries, show_countries, rejected_countries = transform_countries(rows)
+
     insert_countries(conn, countries)
     country_map = fetch_country_map(conn)
     insert_show_countries(conn, show_countries, country_map)
@@ -88,15 +84,17 @@ def main():
     print(f"Inserted countries: {len(countries)}")
     print(f"Rejected country values: {rejected_countries}")
 
-    # ---------- PEOPLE ----------
+
+    # PEOPLE ETL
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute("""
             SELECT show_id, director, cast_members
             FROM staging_netflix_shows
         """)
-        people_rows = cur.fetchall()
+        rows = cur.fetchall()
 
-    people, show_people, rejected_people = transform_people(people_rows)
+    people, show_people, rejected_people = transform_people(rows)
+
     insert_people(conn, people)
     person_map = fetch_person_map(conn)
     insert_show_people(conn, show_people, person_map)
@@ -104,8 +102,12 @@ def main():
     print(f"Inserted people: {len(people)}")
     print(f"Rejected people values: {rejected_people}")
 
-    # ---------- RELATIONSHIPS ----------
+    # Relationships
+
     insert_show_genres(conn, show_genres, genre_map)
+
+    print(f"Inserted genres: {len(genres)}")
+    print(f"Rejected genre values: {rejected_genres}")
 
     conn.close()
 

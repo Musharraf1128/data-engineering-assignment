@@ -31,7 +31,7 @@ INSERT INTO genres (name) VALUES
 ('TV Shows')
 ON CONFLICT (name) DO NOTHING;
 
--- Countries (partial seed; can be extended with etl)
+-- Countries (partial seed;can be extended this)
 INSERT INTO countries (name) VALUES
 ('United States'),
 ('India'),
