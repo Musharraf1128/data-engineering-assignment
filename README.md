@@ -8,10 +8,9 @@ End-to-end data engineering implementation using PostgreSQL, Python ETL, FastAPI
 
 ## 🎥 Demo
 
-▶️ **[Watch full demo video](./demo.mp4)**
-_Shows end-to-end data ingestion, ETL normalization, constraint enforcement, and API verification._
+**[Watch full demo video](./demo.mp4)**
+Shows end-to-end data ingestion, ETL normalization, constraint enforcement, and API verification.
 
-> ⚠️ Demo video is ~77 MB. Please allow a moment for GitHub to load the player.
 
 ---
 
